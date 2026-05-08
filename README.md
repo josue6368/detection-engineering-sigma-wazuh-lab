@@ -4,6 +4,6 @@ Built a detection engineering lab using Sigma-style rules and Wazuh SIEM. Create
 
 <br />
 
-## wip :building_construction: ...
+## 	:construction_worker: 	:toolbox: wip :building_construction: :hammer_and_wrench: :screwdriver: :nut_and_bolt: :carpentry_saw: 	:clamp: ...
 
 <br />
