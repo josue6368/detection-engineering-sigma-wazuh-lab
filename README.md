@@ -2,7 +2,7 @@
 Built a detection engineering lab using Sigma-style rules and Wazuh SIEM. Created detections for failed logons, PowerShell discovery, and Active Directory group changes, then tested alerts against simulated activity and mapped detections to MITRE ATT&amp;CK.
 
 
-# Detection Engineering Lab
+# Detection Engineering Lab with Sigma & Wazuh
 ## Overview
 
 This project demonstrates the creation, testing, and validation of custom security detections using Windows event telemetry, Active Directory activity, PowerShell logging, Kali Linux attack simulation, and Wazuh SIEM monitoring.
@@ -57,42 +57,8 @@ The lab focused on building and validating detections for:
 ---
 
 ### Detection 1: Brute Force Authentication Detection
-#### Objective
 
-Detect repeated failed authentication attempts against a Windows system.
-#### Attack Simulation
-
-A Kali Linux system generated repeated SMB authentication failures against the Windows domain environment using invalid credentials.
-
-#### Kali Linux Test Command
- ```
-for i in {1..8}; do smbclient -L //192.168.88.140 -U "HOMELAB\\jsmith%WrongPassword123!" -m SMB3; done
-```
-
-**Kali Linux system generating repeated failed SMB authentication attempts against the Active Directory environment using invalid credentials.** <br />
-
-<img width="650" height="196" alt="Screenshot 2026-05-11 144912" src="https://github.com/user-attachments/assets/366ea5f0-59cf-454e-832f-276d3fb91e05" />
-
----
-
-### Windows Event Telemetry
-#### Event ID
-```
-4625
-```
-
-### MITRE ATT&CK
-
-```
-T1110 - Brute Force
-```
-
-**Wazuh custom detection rule 100101 successfully identifying repeated failed authentication attempts associated with brute force behavior.** <br /> 
-<img width="1209" height="7369" alt="Screenshot_12-5-2026_13735_192 168 88 133" src="https://github.com/user-attachments/assets/bae3b17c-36ba-4f50-bbf7-dbf2265ed95f" />
-
---- 
-
-### Sigma-Style Rule
+#### Sigma-Style Rule
 
 ```
 title: Multiple Failed SMB Logins
@@ -122,21 +88,54 @@ tags:
   - attack.credential_access
   - attack.t1110
 ```
+**Figure 1: Sigma-style rule to detect multiple failed SMB logins.** <br />
 
 <img width="698" height="517" alt="Screenshot 2026-05-11 140450" src="https://github.com/user-attachments/assets/4636fd7a-f35f-4c0b-8fdc-497b3301fbd0" />
 
----
+#### Wazuh Custom Detection Rule
 
-### Wazuh Custom Detection Rule
+**Figure 2: Wazuh XML rule for brute force detection.** <br />
 
 <img width="694" height="515" alt="Screenshot 2026-05-11 150001" src="https://github.com/user-attachments/assets/88d7796b-f432-4fc8-acbc-0974980f3c6e" />
 
----
 
-### Validation Result
+#### Objective
+
+Detect repeated failed authentication attempts against a Windows system.
+#### Attack Simulation
+
+A Kali Linux system generated repeated SMB authentication failures against the Windows domain environment using invalid credentials.
+
+#### Kali Linux Test Command
+ ```
+for i in {1..8}; do smbclient -L //192.168.88.140 -U "HOMELAB\\jsmith%WrongPassword123!" -m SMB3; done
+```
+
+**Figure 3: Kali Linux attack simulation generating failed SMB logins..** <br />
+
+<img width="650" height="196" alt="Screenshot 2026-05-11 144912" src="https://github.com/user-attachments/assets/366ea5f0-59cf-454e-832f-276d3fb91e05" />
+
+
+#### Windows Event Telemetry
+##### Event ID
+```
+4625
+```
+
+### MITRE ATT&CK
+
+```
+T1110 - Brute Force
+```
+
+**Figure 4: Windows security event log showing failed login attempts.** <br /> 
+
+<img width="1209" height="7369" alt="Screenshot_12-5-2026_13735_192 168 88 133" src="https://github.com/user-attachments/assets/bae3b17c-36ba-4f50-bbf7-dbf2265ed95f" />
+
+#### Validation Result
 The custom Wazuh rule successfully generated alerts after repeated failed SMB authentication attempts from the Kali Linux system.
 
-#### Evidence Collected
+##### Evidence Collected
 * failed SMB authentication events
 * Wazuh alert generation
 * source IP visibility
@@ -146,11 +145,24 @@ The custom Wazuh rule successfully generated alerts after repeated failed SMB au
 ---
 
 ### Detection 2: PowerShell Discovery Activity Detection
+
+
+#### Sigma-Style Rule
+
+**Figure 5: Sigma-style rule for detecting PowerShell discovery activity.** <br />
+
+<img width="694" height="532" alt="Screenshot 2026-05-11 151722" src="https://github.com/user-attachments/assets/319f4ae8-3734-4706-8d23-878e96bd615c" />
+
+#### Wazuh Custom Detection Rule
+**Figure 6: Wazuh rule for PowerShell Script Block Logging events.** <br />
+
+<img width="939" height="139" alt="Screenshot 2026-05-11 190234" src="https://github.com/user-attachments/assets/b81fb29b-6388-4d26-bc18-e7f9efd3d84e" />
+
 #### Objective
 
 Detect suspicious PowerShell discovery behavior using Script Block Logging telemetry.
 
-### PowerShell Logging Configuration
+#### PowerShell Logging Configuration
 
 PowerShell Script Block Logging was enabled on the Windows 11 endpoint to improve visibility into PowerShell execution activity.
 
@@ -164,7 +176,7 @@ New-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\Scr
 
 ---
 
-### PowerShell Discovery Commands Used
+#### PowerShell Discovery Commands Used
 ```
 Get-Process | Select-Object -First 5
 
@@ -172,43 +184,33 @@ Get-LocalUser
 
 Get-ComputerInfo | Select-Object CsName, WindowsProductName
 ```
+**Figure 7: PowerShell discovery commands executed during simulation.** <br />
+
 <img width="699" height="557" alt="Screenshot 2026-05-11 152148" src="https://github.com/user-attachments/assets/f181426a-8b2a-4003-be28-ab4eb6325441" />
 
 
----
-
-### Windows Event Telemetry
-#### Event ID
+#### Windows Event Telemetry
+##### Event ID
 
 ```
 4104
 ```
 
-### MITRE ATT&CK
+#### MITRE ATT&CK
 
 ```
 T1082 - Process Discovery
 ```
+
+**Figure 8: Windows Event Log showing PowerShell Script Block Logging.** <br />
+
 <img width="2372" height="3533" alt="Screenshot_12-5-2026_145757_192 168 88 133" src="https://github.com/user-attachments/assets/34e87fe1-8534-4caf-9a44-5ffca67554fe" />
 
-
----
-
-### Sigma-Style Rule
-<img width="694" height="532" alt="Screenshot 2026-05-11 151722" src="https://github.com/user-attachments/assets/319f4ae8-3734-4706-8d23-878e96bd615c" />
-
----
-
-### Wazuh Custom Detection Rule
-<img width="939" height="139" alt="Screenshot 2026-05-11 190234" src="https://github.com/user-attachments/assets/b81fb29b-6388-4d26-bc18-e7f9efd3d84e" />
-
----
-
-### Validation Result
+#### Validation Result
 
 The Wazuh SIEM successfully detected PowerShell Script Block Logging events and generated a custom alert when discovery-related PowerShell activity occurred.
 
-#### Evidence Collected
+##### Evidence Collected
 * PowerShell Event ID 4104
 * ScriptBlockText visibility
 * custom Wazuh detection alert
@@ -217,60 +219,54 @@ The Wazuh SIEM successfully detected PowerShell Script Block Logging events and 
 
 ---
 ### Detection 3: Active Directory Group Membership Change Detection
+
+#### Sigma-Style Rule
+
+**Figure 9: Sigma-style rule for detecting AD group membership changes.** <br />
+<img width="694" height="524" alt="Screenshot 2026-05-12 112313" src="https://github.com/user-attachments/assets/11d4912b-c810-4019-a5f4-d501e265e7b7" />
+
+#### Wazuh Custom Detection Rule
+**Figure 10: Wazuh rule for Active Directory group modifications.** <br />
+
+<img width="701" height="199" alt="Screenshot 2026-05-12 115832" src="https://github.com/user-attachments/assets/b5cae42b-2980-44ba-a46d-df3eb6c0c15a" />
+
 #### Objective
 
 Detect suspicious Active Directory group membership modifications that may indicate privilege escalation or account manipulation.
 
----
-### Attack Simulation
+#### Attack Simulation
 An Active Directory group membership change was generated by adding a domain user to an administrative security group.
 
-### PowerShell Command
+#### PowerShell Command
 
 ```
 Add-ADGroupMember -Identity "IT Support" -Members "jsmith"
 ```
+**Figure 11: PowerShell command simulating group membership change.** <br />
 
 <img width="668" height="193" alt="Screenshot 2026-05-12 120351" src="https://github.com/user-attachments/assets/83856934-dc2d-4af1-bded-ca92d3359a04" />
 
 
----
-
-### Windows Event Telemetry
-#### Event ID
+#### Windows Event Telemetry
+##### Event ID
 
 ```
 4728
 ```
 
-### MITRE ATT&CK
+#### MITRE ATT&CK
 ```
 T1098 – Account Manipulation
 ```
+**Figure 12: Windows Event Log showing AD group membership change.** <br />
 
 <img width="1809" height="5543" alt="Screenshot_12-5-2026_121947_192 168 88 133" src="https://github.com/user-attachments/assets/f6480067-31c7-4042-b654-dfab023f10ef" />
 
-
---- 
-
-### Sigma-Style Rule
-
-<img width="694" height="524" alt="Screenshot 2026-05-12 112313" src="https://github.com/user-attachments/assets/11d4912b-c810-4019-a5f4-d501e265e7b7" />
-
----
-
-### Wazuh Custom Detection Rule
-
-<img width="701" height="199" alt="Screenshot 2026-05-12 115832" src="https://github.com/user-attachments/assets/b5cae42b-2980-44ba-a46d-df3eb6c0c15a" />
-
-
----
-
-### Validation Result
+#### Validation Result
 
 The custom Wazuh rule successfully generated alerts when Active Directory group membership changes occurred within the lab environment.
 
-### Evidence Collected
+#### Evidence Collected
 * Windows Event ID 4728
 * group membership change visibility
 * user and group tracking
@@ -279,7 +275,7 @@ The custom Wazuh rule successfully generated alerts when Active Directory group 
 
 ---
 
-## MITRE ATT&CK Coverage
+### MITRE ATT&CK Coverage
 | Detection                     | Technique            | ATT&CK ID |
 | ----------------------------- | -------------------- | --------- |
 | Brute Force Authentication    | Brute Force          | T1110     |
@@ -288,7 +284,7 @@ The custom Wazuh rule successfully generated alerts when Active Directory group 
 
 ---
 
-## Key Skills Demonstrated
+### Key Skills Demonstrated
 * Detection Engineering
 * SIEM Monitoring
 * Wazuh Rule Development
@@ -304,7 +300,7 @@ The custom Wazuh rule successfully generated alerts when Active Directory group 
 
 ---
 
-## Key Takeaways
+### Key Takeaways
 This project reinforced the importance of detection engineering in cybersecurity operations. By developing and testing Sigma rules within a Wazuh environment, it was possible to detect simulated attacks, generate real-time alerts, and better understand the mechanics of threat detection and response.
 
 The project also demonstrated how integrating custom detection rules into a SIEM can enhance security monitoring workflows, produce actionable alerts, and improve overall incident response readiness. It highlighted the value of reproducible lab environments for honing practical security skills.
@@ -312,14 +308,6 @@ The project also demonstrated how integrating custom detection rules into a SIEM
 ### Author
 :floppy_disk: josue6368 <br/>
 Cybersecurity Analyst | IT Professional
-
-
-
-
-
-
-
-
 
 
 
