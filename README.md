@@ -304,12 +304,10 @@ The custom Wazuh rule successfully generated alerts when Active Directory group 
 
 ---
 
-## Lessons Learned
-* Effective detection engineering depends heavily on proper telemetry configuration.
-* PowerShell Script Block Logging significantly improves endpoint visibility.
-* Active Directory monitoring is critical for detecting privilege escalation activity.
-* Sigma-style detection logic can be translated into SIEM-specific detection rules.
-* Wazuh custom rules provide flexible detection capabilities for Windows enterprise environments.
+## Key Takeaways
+This project reinforced the importance of detection engineering in cybersecurity operations. By developing and testing Sigma rules within a Wazuh environment, it was possible to detect simulated attacks, generate real-time alerts, and better understand the mechanics of threat detection and response.
+
+The project also demonstrated how integrating custom detection rules into a SIEM can enhance security monitoring workflows, produce actionable alerts, and improve overall incident response readiness. It highlighted the value of reproducible lab environments for honing practical security skills.
 
 ### Author
 :floppy_disk: josue6368 <br/>
